@@ -7,3 +7,29 @@ body {
   color: black;
   font-family: sans-serif;
 }
+
+
+.fps-indicator {
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  width: 100px;
+
+  line-height: 50px;
+  font-size: 16px;
+  text-align: center;
+  
+  color: red;
+  background: black;
+}
+
+.canvas {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0; 
+  bottom: 0 ;
+
+  margin: auto;
+}

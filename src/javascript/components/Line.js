@@ -12,6 +12,18 @@ class Line {
         ctx.closePath();
         ctx.stroke();
     }
+    
+    drawLines(ctx, points) {
+        ctx.strokeStyle = 'white';
+        ctx.beginPath();
+        ctx.moveTo(points[0].position.x, points[0].position.y)
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].position.x, points[i].position.y)
+        }
+        ctx.moveTo(points[0].position.x, points[0].position.y)
+        ctx.closePath();
+        ctx.stroke();
+    }
 }
 
 export default Line;

@@ -3,18 +3,29 @@ import Line from './Line';
 import _ from 'underscore';
 import { TweenLite } from 'gsap';
 
-const SPEED = 10;
+const SPEED = 1.1;
 
 class CanvasComponent {
     constructor() {
         _.bindAll(this, '_tickHandler', '_resizeHandler');
 
         this._settings = {
-            amount: 50,
+            amount: 100,
             distanceMin: 100
         }
 
+        this.ui = {
+            fps: document.querySelector('.fps-indicator'),
+        }
+
+        this._initTime();
         this._setup();
+    }
+
+    _initTime() {
+        this._now = Date.now()
+        this._lastTime = this._now;
+        this._deltaTime = 16;
     }
 
     _setup() {
@@ -31,33 +42,36 @@ class CanvasComponent {
     }
 
     _initBalls() {
-        this._positions = [];
-        this._directions = [];
+        this._points = [];
 
         for (let i = 0; i < this._settings.amount; i++) {
-            let point = {
+            let position = {
                 x: Math.random() * this._width,
                 y: Math.random() * this._height
-            }
+            };
+            let direction = {
+                x: 1, 
+                y: 1
+            };
+            let velocity =  Math.random() * SPEED;
 
-            this._directions.push({x: 1, y: 1});
-            this._positions.push(point);
+            let point = new Point(position, direction, velocity);
+            this._points.push(point);
         }
     }
 
     _drawBalls() {
-        for (let i = 0; i < this._positions.length; i++) {
-            let point = new Point({ x: this._positions[i].x, y: this._positions[i].y });
-            point.draw(this._ctx);
+        for (let i = 0; i < this._points.length; i++) {
+            this._points[i].draw(this._ctx);
         }
     }
 
     _drawLines() {
-        for (let i = 0; i < this._positions.length; i++) {
-            for (let j = 0; j < this._positions.length; j++) {
-                let distance = this._getDistance(this._positions[i], this._positions[j]);
+        for (let i = 0; i < this._points.length; i++) {
+            for (let j = 0; j < this._points.length; j++) {
+                let distance = this._getDistance(this._points[i].position, this._points[j].position);
                 if ( distance <= this._settings.distanceMin && i != j) {
-                    let line = new Line(this._positions[i], this._positions[j]);
+                    let line = new Line(this._points[i].position, this._points[j].position);
                     line.draw(this._ctx);
                 }
             }
@@ -65,20 +79,14 @@ class CanvasComponent {
     }
 
     _directionManager() {
-        for (let i = 0; i < this._positions.length; i++) {
-            if (this._positions[i].x >= this._width || this._positions[i].x < 0) {
-                this._directions[i].x *= -1;
-            } 
-            if (this._positions[i].y >= this._height || this._positions[i].y < 0 ) {
-                this._directions[i].y *= -1;
-            }
+        for (let i = 0; i < this._points.length; i++) {
+            this._points[i].updateDirection(this._width, this._height);
         }
     }
     
     _updateBallPositions() {
-        for (let i = 0; i < this._positions.length; i++) {
-            this._positions[i].x += this._directions[i].x * SPEED;
-            this._positions[i].y += this._directions[i].y * SPEED;
+        for (let i = 0; i < this._points.length; i++) {
+            this._points[i].update(this._deltaTime);
         }
     }
 
@@ -101,9 +109,17 @@ class CanvasComponent {
         this._updateBallPositions();
     }
 
+    _getFPS() {
+        this._now = Date.now();
+        this._deltaTime = this._now - this._lastTime;
+        this._lastTime = this._now;
+        this.ui.fps.innerHTML = `${Math.round(1000 / this._deltaTime)} fps`;
+    }
+
     _tick() {
         this._draw();
         this._update();
+        this._getFPS();
     }
 
     _resize() {
