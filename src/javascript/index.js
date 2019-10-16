@@ -1,4 +1,6 @@
 //IMPORTS
-import Title from './components/Title.js';
+// import CanvasComponent from './components/CanvasComponent';
+// import PlaneComponent from './components/PlaneComponent';
+import CurvesComponent from './components/CurvesComponent'
 
-Title.createTitle("Boilerplate by Léo Mouraire Hee");
+new CurvesComponent();
